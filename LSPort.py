@@ -888,7 +888,7 @@ class LSPort(LSPair):
             df_weighted_beta.index.min().date(),
             df_weighted_beta.index.max().date()))
 
-        plt.tight_layout()
+        return fig_weighted, fig_port
 
     def _get_next_rebal_date(self, rebalance_method: str) -> dt.datetime:
         

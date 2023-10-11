@@ -125,7 +125,7 @@ with col3:
             st.write("There was a problem collecting the data from Yahoo")
 
 if run_button == "Run":
-    
+
     df_input_full = (df_long.reset_index().merge(
         df_short.reset_index(),
         how = "outer",
@@ -149,3 +149,36 @@ if run_button == "Run":
         long_position = df_input_full[long_leg],
         short_position = df_input_full[short_leg],
         benchmark = df_input_full[benchmark_leg])
+    
+    sidebar_options = st.sidebar.selectbox(
+        label = "Options",
+        options = ["backtest"])
+    
+    col1, col2, col3 = st.columns(3)
+    if sidebar_options == "backtest":
+
+        with col1:
+
+            rebalance_period = st.selectbox(
+                label = "rebalance",
+                options = ["daily"])
+            
+            lookback_window = st.number_input(
+                label = "Rolling Beta Window",
+                min_value = 1,
+                max_value = 365 * 2,
+                value = 120)
+            
+        with col2:
+            backtest_run_button = st.radio(
+                label = "Run Button",
+                options = ["Stop", "Run"])
+            
+        if backtest_run_button == "Run":
+
+            fig_weighted, fig_return = ls_port.plot_position_rebalance(
+                lookback_window = lookback_window,
+                rebalance_method = "daily")
+            
+            st.pyplot(fig_weighted)
+            st.pyplot(fig_return)

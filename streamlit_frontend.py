@@ -18,6 +18,38 @@ st.set_page_config(
 st.header("L/S Pair Analyzer & Backtesting")
 st.write("Made by Diego Alvarez")
 
+# helper functions
+def bus_day_subtract(date_input):
+
+    if dt.date.weekday(date_input) == 6: date_out = date_input - dt.timedelta(days = 6)
+    if dt.date.weekday(date_input) == 5: date_out = date_input - dt.timedelta(days =  5)
+    else: date_out = date_input - dt.timedelta(days = 7)
+
+    return date_out
+
+# cache functions
+@st.cache_data
+def _yf_finance(ticker, start, end):
+
+    return(yf.download(
+        tickers = ticker,
+        start = start,
+        end = end)
+        [["Adj Close"]])
+
+# parametrized function on the call-side so that the data is cached
+@st.cache_data
+def plot_position_rebalance(
+    _ls_port_obj,
+    lookback_window: int,
+    rebalance_method: str):
+
+    fig_weighted, fig_return = _ls_port_obj._plot_position_rebalance(
+        lookback_window = lookback_window,
+        rebalance_method = "daily")
+    
+    return(fig_weighted, fig_return)
+
 bad_tickers = {
     "SPX": "^GSPC",
     "MOVE": "^MOVE",
@@ -50,15 +82,6 @@ with col3:
     run_button = st.radio(
         label = "Select Run to extract data",
         options = ["Stop", "Run"])
-
-@st.cache_data
-def _yf_finance(ticker, start, end):
-
-    return(yf.download(
-        tickers = ticker,
-        start = start,
-        end = end)
-        [["Adj Close"]])
 
 col1, col2, col3 = st.columns(3)
 
@@ -157,6 +180,10 @@ if run_button == "Run":
     col1, col2, col3 = st.columns(3)
     if sidebar_options == "backtest":
 
+        plotting_options = st.sidebar.selectbox(
+            label = "Plotting Option",
+            options = ["MatplotLib", "Streamlit"])
+
         with col1:
 
             rebalance_period = st.selectbox(
@@ -170,13 +197,28 @@ if run_button == "Run":
                 value = 120)
             
         with col2:
+
+            '''
+            start_date, end_date  = df_benchmark.index.min().date(), df_benchmark.index.max().date()
+            max_date = bus_day_subtract(end_date)
+            start_backtest_date = st.date_input(
+                label = "Start Backtest Date",
+                min_value = start_date,
+                max_value = max_date)
+
+            end_backtest_date = st.date_input("End Backtest Date", end_date)
+            '''
+
+        with col3:
+
             backtest_run_button = st.radio(
                 label = "Run Button",
                 options = ["Stop", "Run"])
             
         if backtest_run_button == "Run":
 
-            fig_weighted, fig_return = ls_port.plot_position_rebalance(
+            fig_weighted, fig_return = plot_position_rebalance(
+                _ls_port_obj = ls_port,
                 lookback_window = lookback_window,
                 rebalance_method = "daily")
             

@@ -1,6 +1,7 @@
 import pulp
 import numpy as np
 import seaborn as sns
+import streamlit as st
 import matplotlib.pyplot as plt
 
 import pandas as pd
@@ -16,7 +17,6 @@ import statsmodels.api as sm
 from statsmodels.regression.rolling import RollingOLS
 
 from LSPair import *
-
 
 # pass in values as prices not returns
 class LSPort(LSPair):
@@ -722,7 +722,7 @@ class LSPort(LSPair):
                 
             return df_position_out, df_port_out
     
-    def plot_position_rebalance(
+    def _plot_position_rebalance(
         self,
         lookback_window: int,
         rebalance_method: str,

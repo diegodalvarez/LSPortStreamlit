@@ -198,16 +198,14 @@ if run_button == "Run":
             
         with col2:
 
-            '''
-            start_date, end_date  = df_benchmark.index.min().date(), df_benchmark.index.max().date()
-            max_date = bus_day_subtract(end_date)
-            start_backtest_date = st.date_input(
-                label = "Start Backtest Date",
-                min_value = start_date,
-                max_value = max_date)
+            backtest_start_date = st.date_input(
+                label = "Backtest Start Date",
+                value = df_benchmark.index.min())
+    
+            backtest_end_date = st.date_input(
+                label = "Backtest End Date",
+                value = df_benchmark.index.max())
 
-            end_backtest_date = st.date_input("End Backtest Date", end_date)
-            '''
 
         with col3:
 

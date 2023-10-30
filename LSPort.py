@@ -727,6 +727,7 @@ class LSPort(LSPair):
         lookback_window: int,
         rebalance_method: str,
         figsize = (28, 6),
+        
         verbose = False):
       
         rebalance_methods = ["daily", "weekly", "monthly", "quarterly", "yearly"]

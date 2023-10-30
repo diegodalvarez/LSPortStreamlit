@@ -6,6 +6,7 @@ Created on Thu Apr 27 19:58:00 2023
 """
 
 import datetime as dt
+from turtle import back
 import yfinance as yf
 import streamlit as st
 
@@ -42,11 +43,15 @@ def _yf_finance(ticker, start, end):
 def plot_position_rebalance(
     _ls_port_obj,
     lookback_window: int,
-    rebalance_method: str):
+    rebalance_method: str,
+    backtest_start_date: dt.date,
+    backtest_end_date: dt.date):
 
     fig_weighted, fig_return = _ls_port_obj._plot_position_rebalance(
         lookback_window = lookback_window,
-        rebalance_method = "daily")
+        rebalance_method = "daily",
+        backtest_start_date = backtest_start_date,
+        backtest_end_date = backtest_end_date)
     
     return(fig_weighted, fig_return)
 
@@ -198,14 +203,22 @@ if run_button == "Run":
             
         with col2:
 
+            min_value = df_benchmark.index.min() + dt.timedelta(days = lookback_window)
+            max_value = df_benchmark.index.max()
+
             backtest_start_date = st.date_input(
                 label = "Backtest Start Date",
-                value = df_benchmark.index.min())
+                value = min_value,
+                min_value = min_value,
+                max_value = max_value)
     
             backtest_end_date = st.date_input(
                 label = "Backtest End Date",
-                value = df_benchmark.index.max())
-
+                value = max_value,
+                min_value = min_value,
+                max_value = max_value)
+            
+            if backtest_start_date > backtest_end_date: st.write("Start Date Needs to be before End Date")       
 
         with col3:
 
@@ -218,7 +231,9 @@ if run_button == "Run":
             fig_weighted, fig_return = plot_position_rebalance(
                 _ls_port_obj = ls_port,
                 lookback_window = lookback_window,
-                rebalance_method = "daily")
+                rebalance_method = "daily",
+                backtest_start_date = backtest_start_date,
+                backtest_end_date = backtest_end_date)
             
             st.pyplot(fig_weighted)
             st.pyplot(fig_return)

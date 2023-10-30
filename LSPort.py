@@ -582,6 +582,8 @@ class LSPort(LSPair):
 
     def position_rebalance(
         self,
+        backtest_start_date: dt.date,
+        backtest_end_date: dt.date,
         lookback_window: int,
         rebalance_method: str,
         verbose = False):
@@ -609,10 +611,11 @@ class LSPort(LSPair):
                 melt(id_vars = self.long_position_rtns.index.name).
                 rename(columns = {
                     "variable": "ticker",
-                    "value": "rtns"}))
+                    "value": "rtns"}).
+                query("Date >= @backtest_start_date & Date <= @backtest_end_date"))
             
             if rebalance_method == "daily":
-            
+
                 df_position_out = (full_weighting.drop(
                     columns = ["weight"]).
                     merge(df_returns, how = "inner",  on = ["Date", "ticker"]).
@@ -726,6 +729,8 @@ class LSPort(LSPair):
         self,
         lookback_window: int,
         rebalance_method: str,
+        backtest_start_date: dt.date,
+        backtest_end_date: dt.date,
         figsize = (28, 6),
         
         verbose = False):
@@ -740,6 +745,8 @@ class LSPort(LSPair):
         else:
 
             df_position, df_port = self.position_rebalance(
+                backtest_start_date = backtest_start_date,
+                backtest_end_date = backtest_end_date,
                 lookback_window = lookback_window,
                 rebalance_method = rebalance_method,
                 verbose = False)
